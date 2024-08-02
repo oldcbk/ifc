@@ -2,7 +2,22 @@ name: custom
 on: workflow_dispatch
 jobs:
   cmake-build:
+    name: 在gh的服务器上build此cmake项目
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: checkout gh files
+        uses: actions/checkout@v4
+      - name: test "cmd"
+        run: cmd
+      
+  cmake-install:
+    name: 将gh服务器上由cmake项目生成的输出文件装载到gh账户里
+    needs: cmake-build
+    runs-on: windows-latest
+    steps:
+      - name: 上传artifacts
+        uses: actions/upload-artifact@v4.3.5
+        with:
+          path: ${{github.repositry}}/build
+          overwrite: true
       - run: cmd
