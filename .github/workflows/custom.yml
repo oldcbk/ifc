@@ -1,0 +1,8 @@
+name: custom
+on: push
+jobs:
+  cmake-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmd
