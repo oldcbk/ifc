@@ -1,5 +1,5 @@
 name: custom
-on: push
+on: workflow_dispatch
 jobs:
   cmake-build:
     runs-on: windows-latest
