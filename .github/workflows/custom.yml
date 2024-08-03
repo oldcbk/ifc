@@ -7,17 +7,21 @@ jobs:
     steps:
       - name: checkout gh files
         uses: actions/checkout@v4
-      - name: test "cmd"
-        run: cmd
+      - name: test "cmake"
+        run: cmake --help
+      - name: test "echo"
+        run: echo something
       
   cmake-install:
     name: 将gh服务器上由cmake项目生成的输出文件装载到gh账户里
     needs: cmake-build
     runs-on: windows-latest
     steps:
+      - name: maybe sth
+        run: echo cmake installing
       - name: 上传artifacts
         uses: actions/upload-artifact@v4.3.5
         with:
           path: ${{github.repositry}}/build
           overwrite: true
-      - run: cmd
+
