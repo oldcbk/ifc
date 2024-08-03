@@ -1,27 +1,46 @@
 name: custom
 on: workflow_dispatch
 jobs:
-  cmake-build:
-    name: 在gh的服务器上build此cmake项目
+  cmake-build-install-upload:
     runs-on: windows-latest
     steps:
-      - name: test echo
-        run: echo "::notice::cmake building ~"
-      - name: test "cmake"
-        run: cmake --help
       - name: Check out the repository to the runner
         uses: actions/checkout@v4
-      
-  cmake-install:
-    name: 将gh服务器上由cmake项目生成的输出文件装载到gh账户里
-    needs: cmake-build
-    runs-on: windows-latest
-    steps:
-      - name: 上传artifacts
+
+      - name: Use GitHub Actions provided vcpkg
+        shell: pwsh
+        run: Add-Content "$env:GITHUB_ENV" "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT"
+
+      - name: Configure CMake
+        shell: pwsh
+        run: cmake "--preset=ci-windows"
+          -D CMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release -v
+
+      - name: Install
+        run: |
+          cmake --install build --prefix install --config Release --component Printer -v
+          cmake --install build --prefix install --config Release --component Development -v
+
+      - name: Test
+        working-directory: build
+        run: ctest -C Release
+
+      - name: 上传build
         uses: actions/upload-artifact@v4.3.5
         with:
-          name: binaries
-          path: ./build
+          name: build
+          path: build
+          if-no-files-found: error
+          overwrite: true
+
+      - name: 上传install
+        uses: actions/upload-artifact@v4.3.5
+        with:
+          name: install
+          path: install
           if-no-files-found: error
           overwrite: true
 
